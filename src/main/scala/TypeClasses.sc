@@ -49,5 +49,47 @@ combineAll(ints, intAdditionMonoid) // 6
 combineAll(strings, concatStringMonoid) // abc
 
 
+/* implicit derivation:
+
+Note that a Monoid[Pair[A, B]] is derivable given Monoid[A] and Monoid[B]:
+ */
+
+final case class Pair[A, B](first: A, second: B)
+
+def deriveMonoidPair[A, B](A: Monoid[A], B: Monoid[B]): Monoid[Pair[A, B]] =
+  new Monoid[Pair[A, B]] {
+    def empty: Pair[A, B] = Pair(A.empty, B.empty)
+
+    def combine(x: Pair[A, B], y: Pair[A, B]): Pair[A, B] =
+      Pair(A.combine(x.first, y.first), B.combine(x.second, y.second))
+  }
+
+// LAWS
+
+/*
+Conceptually, all type classes come with laws.
+
+For instance, the Monoid type class requires that:
+combine be associative
+empty be an identity element for combine
+
+=>
+
+combine(x, combine(y, z)) = combine(combine(x, y), z)
+combine(x, id) = combine(id, x) = x
+ */
 
 
+val list = List(1, 2, 3, 4, 5)
+val (left, right) = list.splitAt(2)
+
+// Imagine the following two operations run in parallel
+val sumLeft = combineAll(left, intAdditionMonoid)
+// sumLeft: Int = 3
+
+val sumRight = combineAll(right, intAdditionMonoid)
+// sumRight: Int = 12
+
+// Now gather the results
+val result = intAdditionMonoid.combine(sumLeft, sumRight)
+// result: Int = 15
