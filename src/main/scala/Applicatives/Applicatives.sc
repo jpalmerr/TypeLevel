@@ -71,6 +71,3 @@ def attemptConnect(username: String, password: String, url: String): Option[Conn
 
 // We know statically we have 3 Options, so we can use map3 specifically.
 Applicative[Option].map3(username, password, url)(attemptConnect)
-// Some(None)
-
-
