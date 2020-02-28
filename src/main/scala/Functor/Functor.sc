@@ -23,5 +23,11 @@ val listOption: List[Option[Int]] = List(Some(1), None, Some(2))
 Functor[List].compose[Option].map(listOption)(_ + 1)
 // List[Option[Int]] = List(Some(2), None, Some(3))
 
+import cats.data.Nested
+import cats.implicits._
 
+val nested: Nested[List, Option, Int] = Nested(listOption)
+// Nested(List(Some(1), None, Some(2)))
 
+nested.map(_ + 1).value
+// List[Option[Int]] = List(Some(2), None, Some(3))
